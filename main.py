@@ -8,7 +8,7 @@ pygame.font.init()
 pygame.mixer.init()
 
 # Making the main surface
-# Height and Width we want the window to be inside of tuple
+# Height and Width we want the window to be a tuple
 WIDTH, HEIGHT = 900, 500
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("First Game")
@@ -75,7 +75,7 @@ def spawn_powerup():
     return powerup
 
 
-def handle_powerups(player_rect, powerups, player):
+def handle_powerups(player_rect, powerups, bullet_damage, velocity):
     player = RED_SPACESHIP, YELLOW_SPACESHIP
     for powerup in powerups:
         if player_rect.colliderect(pygame.Rect(powerup.x, powerup.y, powerup_width, powerup_height)):
@@ -95,6 +95,7 @@ def handle_powerups(player_rect, powerups, player):
 def draw_powerups(powerups):
     for powerup in powerups:
         powerup.draw(WIN)
+    pygame.display.update()
 
 
 def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health):
@@ -116,7 +117,7 @@ def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_hea
     pygame.display.update()
 
 
-def yellow_handle_movment(keys_pressed, yellow):
+def yellow_handle_movement(keys_pressed, yellow):
     if keys_pressed[pygame.K_a] and yellow.x - velocity > 0:  # Left
         yellow.x -= velocity
     if keys_pressed[pygame.K_d] and yellow.x + velocity + yellow.width < BORDER.x:  # Right
@@ -127,7 +128,7 @@ def yellow_handle_movment(keys_pressed, yellow):
         yellow.y += velocity
 
 
-def red_handle_movment(keys_pressed, red):
+def red_handle_movement(keys_pressed, red):
     if keys_pressed[pygame.K_LEFT] and red.x - velocity > BORDER.x + BORDER.width:  # Left
         red.x -= velocity
     if keys_pressed[pygame.K_RIGHT] and red.x + velocity + red.width < WIDTH:  # Right
@@ -174,13 +175,13 @@ def main():
     yellow_health = 10
 
     powerups = []
-    powerup_spawn_chance = 0.02
+    powerup_spawn_chance = 0.0075
     # Clock controls the speed of the while loop per second
     clock = pygame.time.Clock()
     run = True
     while run:
         clock.tick(FPS)
-        # Getting all game events taking place inlcuding movement, collisions, etc.
+        # Getting all game events taking place including movement, collisions, etc.
         for event in pygame.event.get():
             # Ends while loop(quits the game)
             if event.type == pygame.QUIT:
@@ -216,10 +217,10 @@ def main():
             break
 
         keys_pressed = pygame.key.get_pressed()
-        yellow_handle_movment(keys_pressed, yellow)
-        red_handle_movment(keys_pressed, red)
-        handle_powerups(yellow, powerups, YELLOW_SPACESHIP)
-        handle_powerups(red, powerups, RED_SPACESHIP)
+        yellow_handle_movement(keys_pressed, yellow)
+        red_handle_movement(keys_pressed, red)
+        handle_powerups(yellow, powerups, bullet_damage, velocity)
+        handle_powerups(red, powerups, bullet_damage, velocity)
 
         handle_bullets(yellow_bullets, red_bullets, yellow, red)
 
